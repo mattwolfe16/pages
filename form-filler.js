@@ -27,9 +27,17 @@ function fillUKPostcode() {
   return 'SW1A1AA';
 }
 function fillField(field, value) {
-  field.value = value;
-  field.dispatchEvent(new Event('input', { bubbles: true }));
-  field.dispatchEvent(new Event('change', { bubbles: true }));
+  if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+    const prototype = Object.getPrototypeOf(field);
+    const valueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+    valueSetter.call(field, value);
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.dispatchEvent(new Event('change', { bubbles: true }));
+  } else {
+    field.value = value;
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.dispatchEvent(new Event('change', { bubbles: true }));
+  }
 }
 function getLabelText(input) {
   let label = '';
