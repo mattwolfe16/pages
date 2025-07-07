@@ -220,31 +220,40 @@ function fillForms() {
       }
     }
     if (label.includes('county')) {
-      fillField(input, getRandomCounty());
+      if (!input.value) fillField(input, getRandomCounty());
       return;
     }
     if (label.includes('day')) {
-      fillField(input, dob.day);
+      if (!input.value) fillField(input, dob.day);
       return;
     }
     if (label.includes('month')) {
-      fillField(input, dob.month);
+      if (!input.value) fillField(input, dob.month);
       return;
     }
     if (label.includes('year')) {
-      fillField(input, dob.year);
+      if (!input.value) fillField(input, dob.year);
       return;
     }
     if (input.type === 'checkbox') {
-      const checkboxLabel = (getLabelText(input) + ' ' + (input.parentElement ? input.parentElement.textContent : '')).toLowerCase();
-      if (checkboxLabel.match(/agree|consent|terms|policy|read/i) || checkboxLabel.includes(AGREEMENT_TEXT)) {
+      if (!input.checked) {
+        const checkboxLabel = (getLabelText(input) + ' ' + (input.parentElement ? input.parentElement.textContent : '')).toLowerCase();
+        if (checkboxLabel.match(/agree|consent|terms|policy|read/i) || checkboxLabel.includes(AGREEMENT_TEXT)) {
+          robustCheck(input);
+        }
+      }
+      return;
+    }
+    if (input.type === 'radio') {
+      const labelText = (getLabelText(input) + ' ' + (input.parentElement ? input.parentElement.textContent : '')).toLowerCase();
+      if ((labelText.trim() === 'no' || labelText.match(/^no\b/)) && !input.checked) {
         robustCheck(input);
       }
       return;
     }
     for (const key in fieldMap) {
       if (fieldMap[key].some(k => label.includes(k))) {
-        fillField(input, data[key]);
+        if (!input.value) fillField(input, data[key]);
         return;
       }
     }
@@ -261,14 +270,14 @@ function fillForms() {
   const checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
   checkboxes.forEach(checkbox => {
     const labelText = (getLabelText(checkbox) + ' ' + (checkbox.parentElement ? checkbox.parentElement.textContent : '')).toLowerCase();
-    if (labelText.includes('email')) {
+    if (labelText.includes('email') && !checkbox.checked) {
       robustCheck(checkbox);
     }
   });
   const radios = Array.from(document.querySelectorAll('input[type="radio"]'));
   radios.forEach(radio => {
     const labelText = (getLabelText(radio) + ' ' + (radio.parentElement ? radio.parentElement.textContent : '')).toLowerCase();
-    if (labelText.trim() === 'no' || labelText.match(/^no\b/)) {
+    if ((labelText.trim() === 'no' || labelText.match(/^no\b/)) && !radio.checked) {
       robustCheck(radio);
     }
   });
