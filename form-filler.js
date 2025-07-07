@@ -33,10 +33,12 @@ function fillField(field, value) {
     valueSetter.call(field, value);
     field.dispatchEvent(new Event('input', { bubbles: true }));
     field.dispatchEvent(new Event('change', { bubbles: true }));
+    field.dispatchEvent(new Event('blur', { bubbles: true }));
   } else {
     field.value = value;
     field.dispatchEvent(new Event('input', { bubbles: true }));
     field.dispatchEvent(new Event('change', { bubbles: true }));
+    field.dispatchEvent(new Event('blur', { bubbles: true }));
   }
 }
 function getLabelText(input) {
@@ -82,6 +84,13 @@ function robustCheck(input) {
   if (!label) label = input.closest('label');
   if (label) {
     label.click();
+  } else if (input.type === 'checkbox' || input.type === 'radio') {
+    const prototype = Object.getPrototypeOf(input);
+    const checkedSetter = Object.getOwnPropertyDescriptor(prototype, 'checked').set;
+    checkedSetter.call(input, true);
+    input.dispatchEvent(new Event('click', { bubbles: true }));
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
   } else {
     input.checked = true;
     input.dispatchEvent(new Event('input', { bubbles: true }));
