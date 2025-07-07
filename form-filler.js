@@ -276,4 +276,12 @@ function fillForms() {
 function observeAndFillNHSNumber() {}
 
 // Run the form fill when this script is loaded
-fillForms(); 
+fillForms();
+
+// Set up a MutationObserver to re-run fillForms when the DOM changes (e.g., after clicking Next in a wizard)
+let fillTimeout;
+const observer = new MutationObserver(() => {
+  clearTimeout(fillTimeout);
+  fillTimeout = setTimeout(fillForms, 100); // Only run once every 100ms max
+});
+observer.observe(document.body, { childList: true, subtree: true }); 
