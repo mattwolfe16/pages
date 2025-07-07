@@ -284,13 +284,45 @@ function fillForms() {
 }
 function observeAndFillNHSNumber() {}
 
-// Run the form fill when this script is loaded
-fillForms();
+// Add a floating button to the top of the page
+function addFloatingButton() {
+  // Remove any existing button
+  const existing = document.getElementById('sherlock-fill-btn');
+  if (existing) existing.remove();
 
-// Set up a MutationObserver to re-run fillForms when the DOM changes (e.g., after clicking Next in a wizard)
-let fillTimeout;
-const observer = new MutationObserver(() => {
-  clearTimeout(fillTimeout);
-  fillTimeout = setTimeout(fillForms, 100); // Only run once every 100ms max
+  const btn = document.createElement('button');
+  btn.id = 'sherlock-fill-btn';
+  btn.innerText = 'Fill Form';
+  btn.style.position = 'fixed';
+  btn.style.top = '8px';
+  btn.style.left = '50%';
+  btn.style.transform = 'translateX(-50%)';
+  btn.style.zIndex = '99999';
+  btn.style.padding = '18px 48px';
+  btn.style.fontSize = '2rem';
+  btn.style.background = '#1976d2';
+  btn.style.color = 'white';
+  btn.style.border = 'none';
+  btn.style.borderRadius = '12px';
+  btn.style.boxShadow = '0 2px 12px rgba(0,0,0,0.15)';
+  btn.style.cursor = 'pointer';
+  btn.style.opacity = '0.95';
+  btn.style.transition = 'opacity 0.2s';
+  btn.onmouseenter = () => btn.style.opacity = '1';
+  btn.onmouseleave = () => btn.style.opacity = '0.95';
+  btn.onclick = () => {
+    fillForms();
+  };
+  document.body.appendChild(btn);
+}
+
+// Add the button on initial load
+addFloatingButton();
+
+// Set up a MutationObserver to re-add the button if it is removed (e.g., after navigation in a wizard)
+const buttonObserver = new MutationObserver(() => {
+  if (!document.getElementById('sherlock-fill-btn')) {
+    addFloatingButton();
+  }
 });
-observer.observe(document.body, { childList: true, subtree: true }); 
+buttonObserver.observe(document.body, { childList: true, subtree: true }); 
